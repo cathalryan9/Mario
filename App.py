@@ -2,11 +2,14 @@
 import sys
 import json
 import config
+from logger import Logger
 from grid import Grid
 from flask import Flask, request, Response
+from logger import Logger
+
 
 http_server = Flask(__name__)
-
+logger = Logger()
 
 def main():
     http_server.run(debug=True, threaded=True, host=config.HOST_IP_ADDRESS)
@@ -34,15 +37,16 @@ def check_input():
             "quickestSolutions": g.solutions,
             "error": g.error
         }
-        return json.dumps(response)
-
-    while g.solutions == []:
-        g.nextMove()
-    print(g.solutions)
-    response = {
-        "quickestSolutions": g.solutions,
-        "error_flag": g.error
-    }
+    else:
+        while g.solutions == []:
+            g.nextMove()
+        print(g.solutions)
+        response = {
+            "quickestSolutions": g.solutions,
+            "error_flag": g.error
+        }
+    lgr = Logger()
+    lgr.write(response, "/input")
     return json.dumps(response)
 
 
