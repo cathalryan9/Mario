@@ -3,50 +3,51 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 
+
 class Grid:
     size = 0
     map = 0
-    marioLoc = 0
-    princessLoc = 0
+    mario_loc = 0
+    princess_loc = 0
     error = False
     paths = []
     obstacles = []
     solutions = []
 
-    def nextMove(self):
+    def next_move(self):
         directions = [("UP", (-1, 0)), ("RIGHT", (0, 1)), ("DOWN", (1, 0)), ("LEFT", (0, -1))]
 
-        pathsCopy = list(self.paths)
-        for path in pathsCopy:
-            lastMove = 0
+        paths_copy = list(self.paths)
+        for path in paths_copy:
+            last_move = 0
             if len(path[0]) > 0:
-                lastMove = path[0][-1]
+                last_move = path[0][-1]
 
             for direction in directions:
                 # Don't go backwards
-                if lastMove != 0:
-                    if (direction[0] == "UP" and lastMove == "DOWN") or (direction[0] == "RIGHT" and lastMove == "LEFT") \
-                            or (direction[0] == "DOWN" and lastMove == "UP") or (
-                            direction[0] == "LEFT" and lastMove == "RIGHT"):
+                if last_move != 0:
+                    if (direction[0] == "UP" and last_move == "DOWN") or (direction[0] == "RIGHT" and last_move == "LEFT") \
+                            or (direction[0] == "DOWN" and last_move == "UP") or (
+                            direction[0] == "LEFT" and last_move == "RIGHT"):
                         continue
-                newPath = list(path)
-                newPath[0] = list(path[0])
+                new_path = list(path)
+                new_path[0] = list(path[0])
 
                 # Calculate new co-ordinates
-                newCoordinates = (path[1][0] + direction[1][0], path[1][1] + direction[1][1])
+                new_coordinates = (path[1][0] + direction[1][0], path[1][1] + direction[1][1])
                 # Validate move is in grid
                 # Don't add path if not in grid or is an obstacle
-                if not(-1 < newCoordinates[0] < self.size) or not(-1 < newCoordinates[1] < self.size) or \
-                        (newCoordinates in self.obstacles):
+                if not(-1 < new_coordinates[0] < self.size) or not(-1 < new_coordinates[1] < self.size) or \
+                        (new_coordinates in self.obstacles):
                     continue
-                newPath[1] = newCoordinates
-                newPath[0].append(direction[0])
-                self.paths.append(newPath)
+                new_path[1] = new_coordinates
+                new_path[0].append(direction[0])
+                self.paths.append(new_path)
             self.paths.pop(0)
 
         # Check if the paths have reached the Princess
         for path in self.paths:
-            if path[1] == self.princessLoc:
+            if path[1] == self.princess_loc:
                 self.solutions.append(path[0])
 
     def validate(self, grid):
@@ -54,41 +55,41 @@ class Grid:
         map = map.split(",")
         self.map = list(map)
 
-        marioCounter = 0
-        princessCounter = 0
-        for rowIndex, row in enumerate(self.map):
+        mario_counter = 0
+        princess_counter = 0
+        for row_index, row in enumerate(self.map):
             if len(row) != self.size:
                 return False
-            elif rowIndex >= self.size:
+            elif row_index >= self.size:
                 return False
             # Check chars are valid
-            validChars = ['m', 'p', '-', 'x']
+            valid_chars = ['m', 'p', '-', 'x']
             for char in row:
-                if char not in validChars:
+                if char not in valid_chars:
                     return False
             if "m" in row:
                 if row.count("m") > 1:
                     return False
-                self.marioLoc = (rowIndex, row.find("m"))
-                marioCounter += 1
+                self.mario_loc = (row_index, row.find("m"))
+                mario_counter += 1
             if "p" in row:
                 if row.count("p") > 1:
                     return False
-                self.princessLoc = (rowIndex, row.find("p"))
-                princessCounter += 1
+                self.princess_loc = (rowIndex, row.find("p"))
+                princess_counter += 1
             if "x" in row:
 
                 for charIndex, char in enumerate(row):
                     if char == "x":
                         self.obstacles.append((rowIndex, charIndex))
 
-        if self.princessLoc == 0 or self.marioLoc == 0:
+        if self.princess_loc == 0 or self.mario_loc == 0:
             # Not a valid grid
             return False
 
-        if marioCounter > 1 or princessCounter > 1:
+        if mario_counter > 1 or princess_counter > 1:
             return False
-        self.paths = [[[], self.marioLoc]]
+        self.paths = [[[], self.mario_loc]]
         return True
 
     def update_grid(self, row, col, char):

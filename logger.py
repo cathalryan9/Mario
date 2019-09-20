@@ -11,14 +11,14 @@ class Log(Base):
     __tablename__ = "transaction_log"
 
     id = sql.Column('ID', sql.Integer, primary_key=True)
-    dateTime = sql.Column('DATETIME', sql.DateTime)
-    endPoint = sql.Column('ENDPOINT', sql.String)
+    datetime = sql.Column('DATETIME', sql.DateTime)
+    endpoint = sql.Column('ENDPOINT', sql.String)
     message = sql.Column('MESSAGE', sql.String)
     # TODO: add grid and size
 
     def toString(self):
-        entry = "id=" + str(self.id) + " datetime=" + str(self.dateTime) + \
-              " endpoint=" + str(self.endPoint) + " message=" + str(self.message) + "; "
+        entry = "id=" + str(self.id) + " datetime=" + str(self.datetime) + \
+              " endpoint=" + str(self.endpoint) + " message=" + str(self.message) + "; "
         return entry
 
 
@@ -32,8 +32,8 @@ class Logger():
         Session = sessionmaker(bind=engine)
         session = Session()
         log = Log()
-        log.dateTime = datetime.datetime.now()
-        log.endPoint = str(endpoint)
+        log.datetime = datetime.datetime.now()
+        log.endpoint = str(endpoint)
         log.message = str(message)
         session.add(log)
         session.commit()
@@ -42,9 +42,9 @@ class Logger():
     def read_all(self):
         Session = sessionmaker(bind=engine)
         session = Session()
-        logQuery = session.query(Log).all()
+        log_query = session.query(Log).all()
         logs = ""
-        for l in logQuery:
+        for l in log_query:
             logs += l.toString()
         session.close()
         return logs

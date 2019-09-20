@@ -15,12 +15,12 @@ from dash.dependencies import Input, Output
 http_server = Flask(__name__)
 lgr = Logger()
 g = Grid()
-externalStylesheets = [dbc.themes.CERULEAN]
+external_stylesheets = [dbc.themes.CERULEAN]
 app = dash.Dash(
     __name__,
     server=http_server,
     routes_pathname_prefix='/dash/',
-    external_stylesheets=externalStylesheets
+    external_stylesheets=external_stylesheets
 )
 app.head = [html.Link(rel="stylesheet", href='assets/styles.css')]
 app.layout = html.Div([dcc.Input(
@@ -47,16 +47,16 @@ def update_grid(input_value):
 
 @http_server.route('/input', methods=['POST'])
 def check_input():
-    gridSize = json.loads(request.form["size"].strip())
+    grid_size = json.loads(request.form["size"].strip())
 
-    inputGrid = request.form["grid"].strip()
+    input_grid = request.form["grid"].strip()
     if sys.getdefaultencoding() == "utf-8":
-        inputGrid = inputGrid.replace("‘", "").replace("’", "")
+        input_grid = input_grid.replace("‘", "").replace("’", "")
     else:
-        inputGrid = inputGrid.replace("\x91", "").replace("\x92", "")
-    inputGrid = "\"" + inputGrid + "\""
-    grid = json.loads(inputGrid, encoding='utf-8')
-    g.size = gridSize
+        input_grid = input_grid.replace("\x91", "").replace("\x92", "")
+    input_grid = "\"" + input_grid + "\""
+    grid = json.loads(input_grid, encoding='utf-8')
+    g.size = grid_size
     g.validate(grid)
     if (g.error):
         print(g.error)
@@ -66,7 +66,7 @@ def check_input():
         }
     else:
         while g.solutions == []:
-            g.nextMove()
+            g.next_move()
         print(g.solutions)
         response = {
             "quickestSolutions": g.solutions,
