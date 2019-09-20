@@ -13,7 +13,6 @@ class Grid:
     obstacles = []
     solutions = []
 
-
     def nextMove(self):
         directions = [("UP", (-1, 0)), ("RIGHT", (0, 1)), ("DOWN", (1, 0)), ("LEFT", (0, -1))]
 
@@ -91,8 +90,11 @@ class Grid:
             return False
         self.paths = [[[], self.marioLoc]]
         return True
+
     def update_grid(self, row, col, char):
-        a =0
+        # Placeholder
+        a = 0
+
     def set_grid_blank(self):
         i = 0
         map = []
@@ -113,6 +115,7 @@ class Grid:
         st = "["
         for row in map:
             st += str(row) + ","
+        st = st[:-1]
         st += "]"
         self.map = st
 
@@ -132,24 +135,18 @@ class Grid:
 
 # This class is used to draw the square grid graphically
 class GridGraphic:
-    size = 0
-    #map = ""
     grid = 0
-    #def __init__(self):
-        #print(grid.map)
-        #self.size = grid.size
-        #self.grid = grid
+
+    def __init__(self, grid):
+        self.grid = grid
 
     def draw(self):
-        container = []
-        x = 0
-        while x < self.size:
-            row = []
-            y = 0
-            while y < self.size:
-                row.append(dbc.Col([html.Div("0", className="grid-col")]))
-                y += 1
-            container.append(dbc.Row(row))
-            x += 1
-        dbc.Container(container)
-        return dbc.Container(container, id='grid-container-inner')
+        container_contents = []
+
+        for row in self.grid.map[1:-1].split(','):
+            row_contents = []
+            for col in row[1:-1]:
+                row_contents.append(dbc.Col([html.Div(col, className="grid-col")]))
+            container_contents.append(dbc.Row(row_contents))
+
+        return dbc.Container(container_contents, id='grid-container-inner')

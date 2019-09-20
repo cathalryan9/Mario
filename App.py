@@ -42,7 +42,7 @@ def update_grid(input_value):
         g.size = int(input_value)
         # read from the frontend
         g.set_grid_blank()
-        return GridGraphic().draw()
+        return GridGraphic(g).draw()
 
 
 @http_server.route('/input', methods=['POST'])
