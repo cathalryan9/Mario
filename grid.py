@@ -1,4 +1,8 @@
-import sys
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_bootstrap_components as dbc
+
 class Grid:
     size = 0
     map = 0
@@ -46,7 +50,11 @@ class Grid:
             if path[1] == self.princessLoc:
                 self.solutions.append(path[0])
 
-    def validate(self):
+    def validate(self, grid):
+        map = grid[1:-1]
+        map = map.split(",")
+        self.map = list(map)
+
         marioCounter = 0
         princessCounter = 0
         for rowIndex, row in enumerate(self.map):
@@ -83,24 +91,65 @@ class Grid:
             return False
         self.paths = [[[], self.marioLoc]]
         return True
+    def update_grid(self, row, col, char):
+        a =0
+    def set_grid_blank(self):
+        i = 0
+        map = []
 
-    def __init__(self, size, map):
-        self.size = int(size)
+        # construct blank grid
+        while i < self.size:
+            dash = "'-'"
+            j = 0
+            for row in map:
+                dash = dash[:-1] + '-' + dash[-1:]
+                map[j] = row[:-1] + '-' + row[-1:]
+                j += 1
+            i += 1
+
+            map.append(dash)
+            print(map)
+        # Convert to str
+        st = "["
+        for row in map:
+            st += str(row) + ","
+        st += "]"
+        self.map = st
+
+
+    #def __init__(self):
+        #self.size = int(size)
         # Remove unneeded chars and convert to list
-        map = map[1:-1]
+        #map = map[1:-1]
+        #map = map.split(",")
 
-        #  is \x91 in ascii
-        # if sys.getdefaultencoding() == "utf-8":
-        #    map = map.replace("", "")
-        #    map = map.replace("", "")
-        #else:
-        #    map = map.replace("\x91", "")
-        #    map = map.replace("\x92", "")
-        map = map.split(",")
-
-        self.map = list(map)
+        #self.map = list(map)
 
         # Grid is validated here
-        if not self.validate():
-            self.error = True
+        #if not self.validate():
+            #self.error = True
 
+
+# This class is used to draw the square grid graphically
+class GridGraphic:
+    size = 0
+    #map = ""
+    grid = 0
+    #def __init__(self):
+        #print(grid.map)
+        #self.size = grid.size
+        #self.grid = grid
+
+    def draw(self):
+        container = []
+        x = 0
+        while x < self.size:
+            row = []
+            y = 0
+            while y < self.size:
+                row.append(dbc.Col([html.Div("0", className="grid-col")]))
+                y += 1
+            container.append(dbc.Row(row))
+            x += 1
+        dbc.Container(container)
+        return dbc.Container(container, id='grid-container-inner')
