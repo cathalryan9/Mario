@@ -7,9 +7,9 @@ from grid import Grid
 from flask import Flask, request, Response
 from logger import Logger
 
-
 http_server = Flask(__name__)
-logger = Logger()
+lgr = Logger()
+
 
 def main():
     http_server.run(debug=True, threaded=True, host=config.HOST_IP_ADDRESS)
@@ -45,9 +45,16 @@ def check_input():
             "quickestSolutions": g.solutions,
             "error_flag": g.error
         }
-    lgr = Logger()
+
+    print(__name__)
     lgr.write(response, "/input")
+
     return json.dumps(response)
+
+@http_server.route('/log', methods=['GET'])
+def get_logs():
+    logs = lgr.read_all()
+    return json.dumps(logs)
 
 
 if __name__ == "__main__":

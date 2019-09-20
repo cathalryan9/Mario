@@ -5,7 +5,7 @@ import datetime
 
 Base = declarative_base()
 # Create db in memory
-engine = sql.create_engine('sqlite:///:memory:', echo=True)
+engine = sql.create_engine('sqlite:///pythonsqlite.db', echo=True)
 
 class Log(Base):
     __tablename__ = "transaction_log"
@@ -14,10 +14,17 @@ class Log(Base):
     dateTime = sql.Column('DATETIME', sql.DateTime)
     endPoint = sql.Column('ENDPOINT', sql.String)
     message = sql.Column('MESSAGE', sql.String)
+    # TODO: add grid and size
+
+    def toString(self):
+        entry = "id=" + str(self.id) + " datetime=" + str(self.dateTime) + \
+              " endpoint=" + str(self.endPoint) + " message=" + str(self.message) + "; "
+        return entry
+
 
 # Class used to log data to DB
 class Logger():
-    autoID = 1
+
     def __init__(self):
         Base.metadata.create_all(bind=engine)
 
@@ -25,20 +32,20 @@ class Logger():
         Session = sessionmaker(bind=engine)
         session = Session()
         log = Log()
-        log.id = self.autoID
-        log.datetime = datetime.datetime.now()
-        log.endpoint = endpoint
+        log.dateTime = datetime.datetime.now()
+        log.endPoint = str(endpoint)
         log.message = str(message)
         session.add(log)
         session.commit()
         session.close()
-        self.autoID += 1
 
     def read_all(self):
         Session = sessionmaker(bind=engine)
         session = Session()
-        logs = session.query(Log).all()
-        # TODO: return the logs
-        # for l in logs:
-        # print(str(l))
+        logQuery = session.query(Log).all()
+        logs = ""
+        for l in logQuery:
+            logs += l.toString()
         session.close()
+        return logs
+
