@@ -2,7 +2,6 @@
 import sys
 import json
 import config
-from logger import Logger
 from grid import Grid, GridGraphic
 from flask import Flask, request, Response
 from logger import Logger
@@ -20,29 +19,71 @@ app = dash.Dash(
     __name__,
     server=http_server,
     routes_pathname_prefix='/dash/',
-    external_stylesheets=external_stylesheets
+    external_stylesheets=external_stylesheets,
+    suppress_callback_exceptions=True
 )
+
 app.head = [html.Link(rel="stylesheet", href='assets/styles.css')]
-app.layout = html.Div([dcc.Input(
+app.layout = dbc.Container(id="container-inputs", children=[dbc.Container([dcc.Input(
             id='size-input',
             placeholder='Insert grid size',
             type='number',
-            value='',
+            value='2',
             min=2,
             step=1
-        ), dbc.Container(id='grid-container-outer')])
+        ), dcc.Input(
+            id='grid-input',
+            placeholder='Insert grid layout',
+            type='text',
+            value='[]')]),
+    dbc.Container([GridGraphic(g).draw()], id='container-grid'),
+    dbc.Container(id='container-solutions')])
+
 
 def main():
     app.run_server(debug=True, threaded=True, host=config.HOST_IP_ADDRESS)
 
-@app.callback(Output(component_id='grid-container-outer', component_property='children'),
+@app.callback(Output(component_id='grid-input', component_property='value'),
               [Input(component_id='size-input', component_property='value')])
-def update_grid(input_value):
-    if input_value:
-        g.size = int(input_value)
-        # read from the frontend
+def update_grid_input(size_input):
+    if size_input:
+        g.size = int(size_input)
         g.set_grid_blank()
-        return GridGraphic(g).draw()
+    return g.map
+
+
+@app.callback(Output(component_id='container-grid', component_property='children'),
+              [Input(component_id='grid-input', component_property='value')])
+def update_grid(grid_input):
+    g.obstacles = []
+    g.mario_loc = 0
+    g.princess_loc = 0
+    if len(grid_input) < 6:
+        return
+    grid_input = grid_input.replace("'", "").replace("'", "")
+    g.solutions = []
+    g.map = grid_input
+    g.validate()
+    if g.error:
+        return html.Div(["Invalid grid"], id='error-div')
+    return GridGraphic(g).draw()
+
+@app.callback(Output(component_id='container-solutions', component_property='children'),
+              [Input(component_id='container-grid', component_property='children')])
+def calculate_paths(input):
+    if not g.error:
+        i = 0
+        g.print()
+        while g.solutions == []:
+            g.next_move()
+            # Stop it from hanging
+            if i > 1000:
+                g.paths = []
+                return "unable to calculate"
+            i += 1
+        return str(g.solutions)
+    else:
+        return
 
 
 @http_server.route('/input', methods=['POST'])
@@ -57,25 +98,20 @@ def check_input():
     input_grid = "\"" + input_grid + "\""
     grid = json.loads(input_grid, encoding='utf-8')
     g.size = grid_size
-    g.validate(grid)
-    if (g.error):
-        print(g.error)
+    g.map = grid
+    g.validate()
+    if g.error:
         response = {
-            "quickestSolutions": g.solutions,
-            "error": g.error
+            "quickest_solutions": g.solutions,
+            "error_flag": g.error
         }
     else:
         while g.solutions == []:
             g.next_move()
-        print(g.solutions)
         response = {
-            "quickestSolutions": g.solutions,
+            "quickest_solutions": g.solutions,
             "error_flag": g.error
         }
-
-    print(g.map)
-    lgr.write(response, "/input")
-
     return json.dumps(response)
 
 @http_server.route('/log', methods=['GET'])

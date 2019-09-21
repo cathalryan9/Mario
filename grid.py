@@ -5,14 +5,20 @@ import dash_bootstrap_components as dbc
 
 
 class Grid:
-    size = 0
-    map = 0
-    mario_loc = 0
-    princess_loc = 0
+    size = 2
+    map = ""
+    mario_loc = None
+    princess_loc = None
     error = False
     paths = []
     obstacles = []
     solutions = []
+
+    # For debugging purposes
+    def print(self):
+        print("size:" + str(self.size) + " map:" + self.map + " mario_loc:" + str(self.mario_loc) + " princess_loc:" +
+              str(self.princess_loc) + " error:" + str(self.error) + " paths:" + str(self.paths) +
+              " obstacles:" + str(self.obstacles) + " solutions" + str(self.solutions))
 
     def next_move(self):
         directions = [("UP", (-1, 0)), ("RIGHT", (0, 1)), ("DOWN", (1, 0)), ("LEFT", (0, -1))]
@@ -46,18 +52,23 @@ class Grid:
             self.paths.pop(0)
 
         # Check if the paths have reached the Princess
+
         for path in self.paths:
             if path[1] == self.princess_loc:
                 self.solutions.append(path[0])
 
-    def validate(self, grid):
-        map = grid[1:-1]
+    # returns True if grid is valid
+    def validate(self):
+        # convert map to list for iteration
+        map = self.map[1:-1]
         map = map.split(",")
-        self.map = list(map)
-
+        map = list(map)
+        # self.error will change to False if method does not return due to error
+        self.error = True
         mario_counter = 0
         princess_counter = 0
-        for row_index, row in enumerate(self.map):
+        for row_index, row in enumerate(map):
+            # Check row lengths
             if len(row) != self.size:
                 return False
             elif row_index >= self.size:
@@ -75,31 +86,25 @@ class Grid:
             if "p" in row:
                 if row.count("p") > 1:
                     return False
-                self.princess_loc = (rowIndex, row.find("p"))
+                self.princess_loc = (row_index, row.find("p"))
                 princess_counter += 1
             if "x" in row:
-
-                for charIndex, char in enumerate(row):
+                for char_index, char in enumerate(row):
                     if char == "x":
-                        self.obstacles.append((rowIndex, charIndex))
+                        self.obstacles.append((row_index, char_index))
 
-        if self.princess_loc == 0 or self.mario_loc == 0:
-            # Not a valid grid
+        if not bool(self.princess_loc) or not bool(self.mario_loc):
             return False
-
-        if mario_counter > 1 or princess_counter > 1:
+        if mario_counter != 1 or princess_counter != 1:
             return False
         self.paths = [[[], self.mario_loc]]
+        self.error = False
         return True
 
-    def update_grid(self, row, col, char):
-        # Placeholder
-        a = 0
-
+    # Sets the map to a blank grid. The size is determined by size property
     def set_grid_blank(self):
         i = 0
         map = []
-
         # construct blank grid
         while i < self.size:
             dash = "'-'"
@@ -111,7 +116,6 @@ class Grid:
             i += 1
 
             map.append(dash)
-            print(map)
         # Convert to str
         st = "["
         for row in map:
@@ -121,33 +125,24 @@ class Grid:
         self.map = st
 
 
-    #def __init__(self):
-        #self.size = int(size)
-        # Remove unneeded chars and convert to list
-        #map = map[1:-1]
-        #map = map.split(",")
-
-        #self.map = list(map)
-
-        # Grid is validated here
-        #if not self.validate():
-            #self.error = True
-
-
 # This class is used to draw the square grid graphically
 class GridGraphic:
-    grid = 0
+    grid = None
 
-    def __init__(self, grid):
-        self.grid = grid
+    def __init__(self, grid_obj):
+        self.grid = grid_obj
 
+    # returns the grid inside container
     def draw(self):
         container_contents = []
-
+        x_val = 0
         for row in self.grid.map[1:-1].split(','):
             row_contents = []
-            for col in row[1:-1]:
-                row_contents.append(dbc.Col([html.Div(col, className="grid-col")]))
+            y_val = 0
+            for col in row:
+                coordinates = (x_val, y_val)
+                row_contents.append(dbc.Col([html.Div(col, className="grid-col", id="col-"+str(coordinates), contentEditable="true")]))
+                y_val += 1
             container_contents.append(dbc.Row(row_contents))
-
+            x_val += 1
         return dbc.Container(container_contents, id='grid-container-inner')
