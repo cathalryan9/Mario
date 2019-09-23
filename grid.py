@@ -19,6 +19,8 @@ class Grid:
               " obstacles:" + str(self.obstacles) + " visited_coordinates:" + str(self.visited_coordinates) +
               " solutions" + str(self.solutions))
 
+    # Grid has array of possible paths. This goes through the array
+    # and adds additional paths until at princess coordinates.
     def next_move(self):
         directions = [("UP", (-1, 0)), ("RIGHT", (0, 1)), ("DOWN", (1, 0)), ("LEFT", (0, -1))]
 
@@ -49,6 +51,7 @@ class Grid:
                 new_path[1] = new_coordinates
                 new_path[0].append(direction[0])
                 self.paths.append(new_path)
+            # Remove the path just checked. New paths are this path plus one direction
             self.paths.pop(0)
 
         # Check if the paths have reached the Princess
@@ -61,6 +64,7 @@ class Grid:
 
     # returns True if grid is valid
     def validate(self):
+        # Make sure properties are reset
         self.visited_coordinates = []
         self.obstacles = []
         self.solutions = []
@@ -109,6 +113,7 @@ class Grid:
         return True
 
     # Sets the map to a blank grid. The size is determined by size property
+    # Used by app when size input is changed
     def set_grid_blank(self):
         i = 0
         map = []

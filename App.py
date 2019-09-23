@@ -23,8 +23,11 @@ app = dash.Dash(
     suppress_callback_exceptions=True
 )
 
+# Declare containers in app.layout to use callbacks on them
 app.head = [html.Link(rel="stylesheet", href='assets/styles.css')]
-app.layout = dbc.Container(children=[dbc.Container([], id='header'), dbc.Container([dcc.Input(
+app.layout = dbc.Container([
+    dbc.Container([], id='header'),
+    dbc.Container([dcc.Input(
             id='size-input',
             placeholder='Insert grid size',
             type='number',
@@ -39,12 +42,14 @@ app.layout = dbc.Container(children=[dbc.Container([], id='header'), dbc.Contain
             type='text',
             value='[]')], id='container-input'),
     dbc.Container([GridGraphic(g).draw()], id='container-grid'),
-    dbc.Container(id='container-solutions', className='container-solutions')], id='container-main')
+    dbc.Container(id='container-solutions', className='container-solutions')],
+    id='container-main')
 
 
 def main():
     app.run_server(debug=True, threaded=True, host=config.HOST_IP_ADDRESS)
 
+# Callbacks are chained
 @app.callback(Output(component_id='grid-input', component_property='value'),
               [Input(component_id='size-input', component_property='value')])
 def update_grid_input(size_input):
@@ -79,7 +84,6 @@ def calculate_paths(input):
             g.next_move()
             # Stop it from hanging
             if i > (g.size*g.size):
-                g.paths = []
                 content = "Unable to calculate"
                 return html.Div(content, className="solution-div-fail")
             i += 1
@@ -92,7 +96,7 @@ def calculate_paths(input):
         return
 
 
-@http_server.route('/input', methods=['POST'])
+@http_server.route('/path', methods=['POST'])
 def check_input():
     grid_size = json.loads(request.form["size"].strip())
 
@@ -112,8 +116,14 @@ def check_input():
             "error_flag": g.error
         }
     else:
+        i = 0
         while g.solutions == []:
             g.next_move()
+            if i > (g.size * g.size):
+                g.error = True
+                break
+            i += 1
+
         response = {
             "quickest_solutions": g.solutions,
             "error_flag": g.error

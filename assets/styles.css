@@ -29,6 +29,7 @@ background: linear-gradient(90deg, rgba(229,37,33,1) 10%, rgba(4,156,216,1) 64%,
 }
 #size-input{
     margin-bottom: 20px;
+    width: 20%;
 }
 .grid-row{
     margin: auto;
