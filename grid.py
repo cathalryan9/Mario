@@ -141,8 +141,9 @@ class GridGraphic:
             y_val = 0
             for col in row:
                 coordinates = (x_val, y_val)
-                row_contents.append(dbc.Col([html.Div(col, className="grid-col", id="col-"+str(coordinates), contentEditable="true")]))
+                class_names = {'x': 'grid-col-x', '-': 'grid-col-blank', 'm': 'grid-col-mario', 'p': 'grid-col-princess'}
+                row_contents.append(dbc.Col([dbc.Col([col], className='grid-col ' + class_names[col], id="col-"+str(coordinates))]))
                 y_val += 1
-            container_contents.append(dbc.Row(row_contents))
+            container_contents.append(dbc.Row(row_contents, className='grid-row'))
             x_val += 1
         return dbc.Container(container_contents, id='grid-container-inner')

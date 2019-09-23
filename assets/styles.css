@@ -1,0 +1,77 @@
+#_dash-app-content{
+background-color: white;
+height: 100%;
+width: 100%;
+position: fixed;
+margin: auto;
+}
+
+.container{
+    padding: 20px;
+    text-align: center;
+    display: inline-grid;
+
+    }
+.grid-row{
+    margin: auto;
+}
+.grid-col{
+    width: 40px;
+    height: 40px;
+    line-height: 30px;
+    border: thin solid grey;
+    color: transparent;
+    background-color: white;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    }
+.col{
+    padding-left: 0px;
+    padding-right: 0px;
+
+}
+
+#error-div {
+                display: inline-block;
+                border-radius: 3px;
+                background: rgb(229, 37, 33, 0.4);
+                padding: 10px;
+                padding-left: 20px;
+                padding-right: 20px;
+}
+.solution-div-fail {
+                display: inline-block;
+                border-radius: 3px;
+                background: rgb(229, 37, 33, 0.4);
+                padding: 10px;
+                padding-left: 20px;
+                padding-right: 20px;
+}
+.grid-col-x{
+    background-image: url(https://cdn.pixabay.com/photo/2016/12/24/23/50/pattern-1929506_960_720.png);
+}
+.grid-col-blank{
+}
+.grid-col-mario{
+    background-image: url(https://www.pinclipart.com/picdir/big/7-70019_pipe-clipart-pixel-art-mario-bros-64-bits.png);
+}
+.grid-col-princess{
+    background-image: url(https://www.trzcacak.rs/myfile/detail/254-2546833_super-mario-clipart-mystery-number-mario-bros-peach.png);
+}
+
+.solution-div-success{
+
+    padding-left: 20px;
+    padding-right: 20px;
+    color: black;
+
+}
+.container-solutions{
+    display: inline-block;
+    border-radius: 3px;
+    background: rgb(4, 156, 216, 0.4);
+    padding: 0px;
+    display: block;
+}
+

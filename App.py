@@ -14,7 +14,7 @@ from dash.dependencies import Input, Output
 http_server = Flask(__name__)
 lgr = Logger()
 g = Grid()
-external_stylesheets = [dbc.themes.CERULEAN]
+external_stylesheets = [dbc.themes.BOOTSTRAP]
 app = dash.Dash(
     __name__,
     server=http_server,
@@ -30,14 +30,16 @@ app.layout = dbc.Container(id="container-inputs", children=[dbc.Container([dcc.I
             type='number',
             value='2',
             min=2,
-            step=1
+            step=1,
+            className='input-group form-control'
         ), dcc.Input(
             id='grid-input',
+            className='input-group form-control',
             placeholder='Insert grid layout',
             type='text',
             value='[]')]),
     dbc.Container([GridGraphic(g).draw()], id='container-grid'),
-    dbc.Container(id='container-solutions')])
+    dbc.Container(id='container-solutions', className='container-solutions')])
 
 
 def main():
@@ -71,6 +73,7 @@ def update_grid(grid_input):
 @app.callback(Output(component_id='container-solutions', component_property='children'),
               [Input(component_id='container-grid', component_property='children')])
 def calculate_paths(input):
+    content = ""
     if not g.error:
         i = 0
         g.print()
@@ -79,9 +82,13 @@ def calculate_paths(input):
             # Stop it from hanging
             if i > 1000:
                 g.paths = []
-                return "unable to calculate"
+                content = "Unable to calculate"
+                return html.Div(content, className="solution-div-fail")
             i += 1
-        return str(g.solutions)
+        solution_container = []
+        for solution in g.solutions:
+            solution_container.append(html.Div(str(solution), className="solution-div-success list-group"))
+        return html.Div(solution_container, className='solution-container-inner')
     else:
         return
 
