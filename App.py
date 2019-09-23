@@ -3,7 +3,7 @@ import sys
 import json
 import config
 from grid import Grid, GridGraphic
-from flask import Flask, request, Response
+from flask import Flask, request
 from logger import Logger
 import dash
 import dash_core_components as dcc
@@ -24,7 +24,7 @@ app = dash.Dash(
 )
 
 app.head = [html.Link(rel="stylesheet", href='assets/styles.css')]
-app.layout = dbc.Container(id="container-inputs", children=[dbc.Container([dcc.Input(
+app.layout = dbc.Container(children=[dbc.Container([], id='header'), dbc.Container([dcc.Input(
             id='size-input',
             placeholder='Insert grid size',
             type='number',
@@ -37,9 +37,9 @@ app.layout = dbc.Container(id="container-inputs", children=[dbc.Container([dcc.I
             className='input-group form-control',
             placeholder='Insert grid layout',
             type='text',
-            value='[]')]),
+            value='[]')], id='container-input'),
     dbc.Container([GridGraphic(g).draw()], id='container-grid'),
-    dbc.Container(id='container-solutions', className='container-solutions')])
+    dbc.Container(id='container-solutions', className='container-solutions')], id='container-main')
 
 
 def main():
@@ -73,19 +73,18 @@ def update_grid(grid_input):
 @app.callback(Output(component_id='container-solutions', component_property='children'),
               [Input(component_id='container-grid', component_property='children')])
 def calculate_paths(input):
-    content = ""
     if not g.error:
         i = 0
-        g.print()
         while g.solutions == []:
             g.next_move()
             # Stop it from hanging
-            if i > 1000:
+            if i > (g.size*g.size):
                 g.paths = []
                 content = "Unable to calculate"
                 return html.Div(content, className="solution-div-fail")
             i += 1
         solution_container = []
+
         for solution in g.solutions:
             solution_container.append(html.Div(str(solution), className="solution-div-success list-group"))
         return html.Div(solution_container, className='solution-container-inner')

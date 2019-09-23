@@ -1,6 +1,3 @@
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 
@@ -11,6 +8,7 @@ class Grid:
     princess_loc = None
     error = False
     paths = []
+    visited_coordinates = []
     obstacles = []
     solutions = []
 
@@ -18,7 +16,8 @@ class Grid:
     def print(self):
         print("size:" + str(self.size) + " map:" + self.map + " mario_loc:" + str(self.mario_loc) + " princess_loc:" +
               str(self.princess_loc) + " error:" + str(self.error) + " paths:" + str(self.paths) +
-              " obstacles:" + str(self.obstacles) + " solutions" + str(self.solutions))
+              " obstacles:" + str(self.obstacles) + " visited_coordinates:" + str(self.visited_coordinates) +
+              " solutions" + str(self.solutions))
 
     def next_move(self):
         directions = [("UP", (-1, 0)), ("RIGHT", (0, 1)), ("DOWN", (1, 0)), ("LEFT", (0, -1))]
@@ -43,8 +42,9 @@ class Grid:
                 new_coordinates = (path[1][0] + direction[1][0], path[1][1] + direction[1][1])
                 # Validate move is in grid
                 # Don't add path if not in grid or is an obstacle
+                # Or already visited by other path in previous attempts
                 if not(-1 < new_coordinates[0] < self.size) or not(-1 < new_coordinates[1] < self.size) or \
-                        (new_coordinates in self.obstacles):
+                        (new_coordinates in self.obstacles) or (new_coordinates in self.visited_coordinates):
                     continue
                 new_path[1] = new_coordinates
                 new_path[0].append(direction[0])
@@ -54,11 +54,16 @@ class Grid:
         # Check if the paths have reached the Princess
 
         for path in self.paths:
+            if path[1] not in self.visited_coordinates:
+                self.visited_coordinates.append(path[1])
             if path[1] == self.princess_loc:
                 self.solutions.append(path[0])
 
     # returns True if grid is valid
     def validate(self):
+        self.visited_coordinates = []
+        self.obstacles = []
+        self.solutions = []
         # convert map to list for iteration
         map = self.map[1:-1]
         map = map.split(",")
@@ -91,7 +96,8 @@ class Grid:
             if "x" in row:
                 for char_index, char in enumerate(row):
                     if char == "x":
-                        self.obstacles.append((row_index, char_index))
+                        if (row_index, char_index) not in self.obstacles:
+                            self.obstacles.append((row_index, char_index))
 
         if not bool(self.princess_loc) or not bool(self.mario_loc):
             return False
@@ -99,6 +105,7 @@ class Grid:
             return False
         self.paths = [[[], self.mario_loc]]
         self.error = False
+        self.print()
         return True
 
     # Sets the map to a blank grid. The size is determined by size property
