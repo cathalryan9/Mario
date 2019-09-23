@@ -1,0 +1,4 @@
+**/venv
+pythonsqlite.db
+**.idea/
+**__pycache__/
