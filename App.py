@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
 import json
-import config
 from grid import Grid, GridGraphic
 from flask import Flask, request
 from logger import Logger
@@ -47,7 +46,7 @@ app.layout = dbc.Container([
 
 
 def main():
-    app.run_server(debug=True, threaded=True, host=config.HOST_IP_ADDRESS)
+    app.run_server(debug=True, threaded=True)
 
 # Callbacks are chained
 @app.callback(Output(component_id='grid-input', component_property='value'),

@@ -16,4 +16,4 @@ def create_connection(db_file):
 
 
 if __name__ == '__main__':
-    create_connection(r"C:\Users\Cathal\PycharmProjects\Mario\pythonsqlite.db")
+    create_connection(r"pythonsqlite.db")

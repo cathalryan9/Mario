@@ -1,3 +1,0 @@
-HOST_IP_ADDRESS = "127.0.0.1"
-PORT = "5000"
-SERVER_URL = 'http://' + HOST_IP_ADDRESS + ':' + PORT

@@ -1,2 +1,5 @@
 dash
 Flask==1.1.1
+sqlalchemy
+dash_bootstrap_components
+dash_html_components
